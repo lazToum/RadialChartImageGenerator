@@ -27,6 +27,7 @@
     k.c = {};
     k.c.d = $(document);
     k.c.t = function (e) {
+        //noinspection JSUnresolvedVariable
         return e.originalEvent.touches.length - 1;
     };
 
@@ -56,7 +57,7 @@
         this.$c = null; // jQuery canvas element
         this.c = null; // rendered canvas context
         this.t = 0; // touches index
-        this.isInit = false;
+        // this.isInit = false;
         this.fgColor = null; // main color
         this.pColor = null; // previous color
         this.dH = null; // draw hook
@@ -73,13 +74,17 @@
             var cf = function (e, conf) {
                 var k;
                 for (k in conf) {
-                    s.o[k] = conf[k];
+                    if (conf.hasOwnProperty(k)) {
+                        s.o[k] = conf[k];
+                    }
                 }
 
                 s._carve().init();
                 s._configure()
-                 ._draw();
+                    ._draw();
             };
+
+            var maxval = this.$.data('max') !== undefined ? this.$.data('max') : 100;
 
             if(this.$.data('kontroled')) return;
             this.$.data('kontroled', true);
@@ -89,21 +94,21 @@
                 {
                     // Config
                     min : this.$.data('min') !== undefined ? this.$.data('min') : 0,
-                    max : this.$.data('max') !== undefined ? this.$.data('max') : 100,
+                    max : maxval,
                     stopper : true,
                     readOnly : this.$.data('readonly') || (this.$.attr('readonly') === 'readonly'),
 
                     // UI
                     cursor : (this.$.data('cursor') === true && 30) ||
-                                this.$.data('cursor') || 0,
+                    this.$.data('cursor') || 0,
                     thickness : (
-                                    this.$.data('thickness') &&
-                                    Math.max(Math.min(this.$.data('thickness'), 1), 0.01)
-                                ) || 0.35,
+                        this.$.data('thickness') &&
+                        Math.max(Math.min(this.$.data('thickness'), 1), 0.01)
+                    ) || 0.35,
                     bgthickness : (
-                                    this.$.data('bgthickness') &&
-                                    Math.max(Math.min(this.$.data('bgthickness'), 1), 0.00)
-                                ) || 0.35,
+                        this.$.data('bgthickness') &&
+                        Math.max(Math.min(this.$.data('bgthickness'), 1), 0.00)
+                    ) || 0.35,
                     lineCap : this.$.data('linecap') || 'butt',
                     width : this.$.data('width') || 200,
                     height : this.$.data('height') || 200,
@@ -115,8 +120,10 @@
                     inputColor: this.$.data('inputcolor'),
                     font: this.$.data('font') || 'Arial',
                     fontWeight: this.$.data('font-weight') || 'bold',
+                    direction: this.$.data('direction') || 'up',
                     inline : false,
                     step : this.$.data('step') || 1,
+                    steps : this.$.data('steps') || maxval,
                     rotation: this.$.data('rotation'),
 
                     // Hooks
@@ -198,7 +205,7 @@
             this.$div = this.$.parent();
 
             if (typeof G_vmlCanvasManager !== 'undefined') {
-              G_vmlCanvasManager.initElement(this.$c[0]);
+                G_vmlCanvasManager.initElement(this.$c[0]);
             }
 
             this.c = this.$c[0].getContext ? this.$c[0].getContext('2d') : null;
@@ -212,20 +219,21 @@
             }
 
             // hdpi support
+            //noinspection JSUnresolvedVariable
             this.scale = (window.devicePixelRatio || 1) /
-                        (
-                            this.c.webkitBackingStorePixelRatio ||
-                            this.c.mozBackingStorePixelRatio ||
-                            this.c.msBackingStorePixelRatio ||
-                            this.c.oBackingStorePixelRatio ||
-                            this.c.backingStorePixelRatio || 1
-                        );
+                (
+                    this.c.webkitBackingStorePixelRatio ||
+                    this.c.mozBackingStorePixelRatio ||
+                    this.c.msBackingStorePixelRatio ||
+                    this.c.oBackingStorePixelRatio ||
+                    this.c.backingStorePixelRatio || 1
+                );
 
             // detects relative width / height
             this.relativeWidth = ((this.o.width % 1 !== 0) &&
-                this.o.width.indexOf('%'));
+            this.o.width.indexOf('%'));
             this.relativeHeight = ((this.o.height % 1 !== 0) &&
-                this.o.height.indexOf('%'));
+            this.o.height.indexOf('%'));
             this.relative = (this.relativeWidth || this.relativeHeight);
 
             // computes size and carves the component
@@ -251,7 +259,7 @@
                 ._xy()
                 .init();
 
-            this.isInit = true;
+            // this.isInit = true;
 
             this.$.val(this.o.format(this.v));
             this._draw();
@@ -262,13 +270,13 @@
         this._carve = function() {
             if(this.relative) {
                 var w = this.relativeWidth ?
-                            this.$div.parent().width() *
-                            parseInt(this.o.width) / 100 :
-                            this.$div.parent().width(),
+                        this.$div.parent().width() *
+                        parseInt(this.o.width) / 100 :
+                        this.$div.parent().width(),
                     h = this.relativeHeight ?
-                            this.$div.parent().height() *
-                            parseInt(this.o.height) / 100 :
-                            this.$div.parent().height();
+                        this.$div.parent().height() *
+                        parseInt(this.o.height) / 100 :
+                        this.$div.parent().height();
 
                 // apply relative
                 this.w = this.h = Math.min(w, h);
@@ -298,12 +306,12 @@
             }
 
             return this;
-        }
+        };
 
         this._draw = function () {
 
             // canvas pre-rendering
-            var d = true;
+            var d;
 
             s.g = s.c;
 
@@ -320,10 +328,11 @@
 
             var touchMove = function (e) {
 
+                //noinspection JSUnresolvedVariable
                 var v = s.xy2val(
-                            e.originalEvent.touches[s.t].pageX,
-                            e.originalEvent.touches[s.t].pageY
-                            );
+                    e.originalEvent.touches[s.t].pageX,
+                    e.originalEvent.touches[s.t].pageY
+                );
 
                 if (v == s.cv) return;
 
@@ -390,7 +399,7 @@
                 )
                 .bind(
                     "mouseup.k"
-                    , function (e) {
+                    , function () {
                         k.c.d.unbind('mousemove.k mouseup.k keyup.k');
                         s.val(s.cv);
                     }
@@ -415,14 +424,14 @@
                         , function (e) {
                             e.preventDefault();
                             s._xy()._mouse(e);
-                         }
+                        }
                     )
                     .bind(
                         "touchstart"
                         , function (e) {
                             e.preventDefault();
                             s._xy()._touch(e);
-                         }
+                        }
                     );
 
                 this.listen();
@@ -433,7 +442,7 @@
             if(this.relative) {
                 $(window).resize(function() {
                     s._carve()
-                     .init();
+                        .init();
                     s._draw();
                 });
             }
@@ -460,7 +469,7 @@
         };
 
         this._clear = function () {
-            this.$c[0].width = this.$c[0].width;
+            this.$c[0].width = this.$c[0].width || 0;
         };
 
         this._validate = function(v) {
@@ -480,15 +489,15 @@
         // Utils
         this.h2rgba = function (h, a) {
             var rgb;
-            h = h.substring(1,7)
+            h = h.substring(1,7);
             rgb = [parseInt(h.substring(0,2),16)
-                   ,parseInt(h.substring(2,4),16)
-                   ,parseInt(h.substring(4,6),16)];
+                ,parseInt(h.substring(2,4),16)
+                ,parseInt(h.substring(4,6),16)];
             return "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + "," + a + ")";
         };
 
         this.copy = function (f, t) {
-            for (var i in f) { t[i] = f[i]; }
+            for (var i in f) { if(f.hasOwnProperty(i)) {t[i] = f[i];} }
         };
     };
 
@@ -525,10 +534,9 @@
 
                 // reverse format
                 v = this.o.parse(v);
-
                 if (
                     triggerRelease !== false && (v != this.v) && this.rH &&
-                        (this.rH(v) === false)
+                    (this.rH(v) === false)
                 ) return;
 
                 this.cv = this.o.stopper ? max(min(v, this.o.max), this.o.min) : v;
@@ -544,9 +552,9 @@
             var a, ret;
 
             a = Math.atan2(
-                        x - (this.x + this.w2)
-                        , - (y - this.y - this.w2)
-                    ) - this.angleOffset;
+                    x - (this.x + this.w2)
+                    , - (y - this.y - this.w2)
+                ) - this.angleOffset;
 
             if (this.o.flip) {
                 a = this.angleArc - a - this.PI2;
@@ -560,7 +568,7 @@
             }
 
             ret = ~~ (0.5 + (a * (this.o.max - this.o.min) / this.angleArc))
-                    + this.o.min;
+                + this.o.min;
 
             this.o.stopper && (ret = max(min(ret, this.o.max), this.o.min));
 
@@ -573,11 +581,12 @@
                 mw = function (e) {
                     e.preventDefault();
 
+                    //noinspection JSUnresolvedVariable
                     var ori = e.originalEvent
                         ,deltaX = ori.detail || ori.wheelDeltaX
                         ,deltaY = ori.detail || ori.wheelDeltaY
                         ,v = s._validate(s.o.parse(s.$.val()))
-                            + (deltaX>0 || deltaY>0 ? s.o.step : deltaX<0 || deltaY<0 ? -s.o.step : 0);
+                        + (deltaX>0 || deltaY>0 ? s.o.step : deltaX<0 || deltaY<0 ? -s.o.step : 0);
 
                     v = max(min(v, s.o.max), s.o.min);
 
@@ -644,7 +653,7 @@
                 )
                 .bind(
                     "keyup"
-                    ,function (e) {
+                    ,function () {
                         if (isNaN(kval)) {
                             if (to) {
                                 window.clearTimeout(to);
@@ -666,22 +675,25 @@
         };
 
         this.init = function () {
-
             if (
                 this.v < this.o.min
                 || this.v > this.o.max
             ) this.v = this.o.min;
-
             this.$.val(this.v);
+            // if (this.o.steps > this.o.max){
+            //     this.o.steps = this.o.max;
+            // }
+            this.steps = this.o.steps;
             this.w2 = this.w / 2;
             this.cursorExt = this.o.cursor / 100;
             this.xy = this.w2 * this.scale;
             this.lineWidth = this.xy * this.o.thickness;
             this.bglineWidth = this.xy * this.o.bgthickness;
             this.lineCap = this.o.lineCap;
+            this.direction = this.o.direction;
             this.radius = this.xy - this.lineWidth / 2 - 10;
             this.bgradius = this.radius;
-
+            // console.log(this.direction);
             this.o.angleOffset
             && (this.o.angleOffset = isNaN(this.o.angleOffset) ? 0 : this.o.angleOffset);
 
@@ -697,32 +709,31 @@
             this.endAngle = 1.5 * Math.PI + this.angleOffset + this.angleArc;
 
             var s = max(
-                            String(Math.abs(this.o.max)).length
-                            , String(Math.abs(this.o.min)).length
-                            , 2
-                            ) + 2;
-
+                    String(Math.abs(this.o.max)).length
+                    , String(Math.abs(this.o.min)).length
+                    , 2
+                ) + 2;
             this.o.displayInput
-                && this.i.css({
-                        'width' : ((this.w / 2 + 4) >> 0) + 'px'
-                        ,'height' : ((this.w / 3) >> 0) + 'px'
-                        ,'position' : 'absolute'
-                        ,'vertical-align' : 'middle'
-                        ,'margin-top' : ((this.w / 3) >> 0) + 'px'
-                        ,'margin-left' : '-' + ((this.w * 3 / 4 + 2) >> 0) + 'px'
-                        ,'border' : 0
-                        ,'background' : 'none'
-                        ,'font' : this.o.fontWeight + ' ' + ((this.w / s) >> 0) + 'px ' + this.o.font
-                        ,'text-align' : 'center'
-                        ,'color' : this.o.inputColor || this.o.fgColor
-                        ,'padding' : '0px'
-                        ,'-webkit-appearance': 'none'
-                        ,'visibility' : 'visible'
-                        })
-                || this.i.css({
-                        'width' : '0px'
-                        ,'visibility' : 'hidden'
-                        });
+            && this.i.css({
+                'width' : ((this.w / 2 + 4) >> 0) + 'px'
+                ,'height' : ((this.w / 3) >> 0) + 'px'
+                ,'position' : 'absolute'
+                ,'vertical-align' : 'middle'
+                ,'margin-top' : ((this.w / 3) >> 0) + 'px'
+                ,'margin-left' : '-' + ((this.w * 3 / 4 + 2) >> 0) + 'px'
+                ,'border' : 0
+                ,'background' : 'none'
+                ,'font' : this.o.fontWeight + ' ' + ((this.w / s) >> 0) + 'px ' + this.o.font
+                ,'text-align' : 'center'
+                ,'color' : this.o.inputColor || this.o.fgColor
+                ,'padding' : '0px'
+                ,'-webkit-appearance': 'none'
+                ,'visibility' : 'visible'
+            })
+            || this.i.css({
+                'width' : '0px'
+                ,'visibility' : 'hidden'
+            });
         };
 
         this.change = function (v) {
@@ -731,27 +742,36 @@
         };
 
         this.angle = function (v) {
-            return (v - this.o.min) * this.angleArc / (this.o.max - this.o.min);
+
+            if (this.direction !== 'up'){
+                return (this.o.max - v) * this.angleArc / (this.o.max - this.o.min);
+            } else {
+                return (v - this.o.min) * this.angleArc / (this.o.max - this.o.min);
+            }
         };
 
         this.arc = function (v) {
-          var sa, ea;
-          v = this.angle(v);
-          if (this.o.flip) {
-              sa = this.endAngle + 0.00001;
-              ea = sa - v - 0.00001;
-          } else {
-              sa = this.startAngle - 0.00001;
-              ea = sa + v + 0.00001;
-          }
-          this.o.cursor
-              && (sa = ea - this.cursorExt)
-              && (ea = ea + this.cursorExt);
-          return {
-              s: sa,
-              e: ea,
-              d: this.o.flip && !this.o.cursor
-          };
+            if (this.direction != 'up') {
+                v = this.o.max - v;
+            }
+            this.$.val(this.o.format(v));
+            var sa, ea;
+            v = this.angle(v);
+            if (this.o.flip) {
+                sa = this.endAngle + 0.00001;
+                ea = sa - v - 0.00001;
+            } else {
+                sa = this.startAngle - 0.00001;
+                ea = sa + v + 0.00001;
+            }
+            this.o.cursor
+            && (sa = ea - this.cursorExt)
+            && (ea = ea + this.cursorExt);
+            return {
+                s: sa,
+                e: ea,
+                d: this.o.flip && !this.o.cursor
+            };
         };
 
         this.draw = function () {
@@ -762,9 +782,9 @@
 
             c.lineWidth = this.bglineWidth;
             c.lineCap = this.lineCap;
-            var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.bglineWidth);
-            gradient.addColorStop("0",this.o.bgColor);
-            gradient.addColorStop("1.0",this.o.bgColorMid);
+            gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.bglineWidth);
+            gradient.addColorStop(0,this.o.bgColor);
+            gradient.addColorStop(1.0,this.o.bgColorMid);
             c.strokeStyle = gradient;
             c.arc(this.xy, this.xy, this.bgradius, (this.PI2/4) - 0.00001, this.startAngle + 0.00001, true);
             // if background width == 0 then don't draw it. Default is to draw a small line
@@ -773,12 +793,12 @@
             }
 
             c.beginPath();
-            var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.bglineWidth);
-            gradient.addColorStop("0",this.o.bgColorEnd);
-            gradient.addColorStop("1.0",this.o.bgColorMid);
+            gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.bglineWidth);
+            gradient.addColorStop(0,this.o.bgColorEnd);
+            gradient.addColorStop(1.0,this.o.bgColorMid);
             c.strokeStyle = gradient;
             c.arc(this.xy, this.xy, this.bgradius, this.startAngle - 0.00001, (this.PI2/4) + 0.00010, true);
-             
+
             // if bgLineWidth == 0 then skip drawing background arc
             if (this.bglineWidth != 0.00) {
                 c.stroke();
@@ -787,39 +807,39 @@
             if (this.o.displayPrevious) {
                 pa = this.arc(this.v);
                 c.beginPath();
-                    c.strokeStyle = this.pColor;
-                    c.arc(this.xy, this.xy, this.radius, pa.s, pa.e, pa.d);
+                c.strokeStyle = this.pColor;
+                c.arc(this.xy, this.xy, this.radius, pa.s, pa.e, pa.d);
                 c.stroke();
                 r = (this.cv == this.v);
             }
             if(this.cv > (this.o.min + this.o.max)/2){
                 c.beginPath();
-                var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
-                    gradient.addColorStop("0",this.o.fgColor);
-                    gradient.addColorStop("0.5",this.o.fgColor);
-                    gradient.addColorStop("1.0",this.o.fgColorMid);
+                gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
+                gradient.addColorStop(0,this.o.fgColor);
+                gradient.addColorStop(0.5,this.o.fgColor);
+                gradient.addColorStop(1.0,this.o.fgColorMid);
                 c.strokeStyle = r ? gradient : this.fgColor ;
                 c.arc(this.xy, this.xy, this.radius,  a.s, (this.PI2/4) - 0.00001, a.d);
                 c.stroke();
                 c.beginPath();
-                var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
-                    gradient.addColorStop("0",this.o.fgColorEnd);
-                    gradient.addColorStop("0.5",this.o.fgColorEnd);
-                    gradient.addColorStop("1.0",this.o.fgColorMid);
+                gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
+                gradient.addColorStop(0,this.o.fgColorEnd);
+                gradient.addColorStop(0.5,this.o.fgColorEnd);
+                gradient.addColorStop(1.0,this.o.fgColorMid);
                 c.strokeStyle = r ? gradient : this.fgColor ;
                 c.arc(this.xy, this.xy, this.radius, this.PI2 * 1.25, a.e, a.d);
 
-                
+
                 c.stroke();
-                
-                var showShadow = $('#'+this.$[0].id).attr('data-shadow');
-                var shadowColor = $('#'+this.$[0].id).attr('data-shadowColor') || $('#'+this.$[0].id).attr('shadow-color');
+                var thisId = $('#'+this.$[0].id);
+                var showShadow = thisId.attr('data-shadow');
+                var shadowColor = thisId.attr('data-shadowColor') || thisId.attr('shadow-color');
                 if(showShadow === 'true') {
                     if(this.cv == this.o.max){
                         c.beginPath();
                         var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
-                            gradient.addColorStop("0",this.o.fgColorEnd);
-                            gradient.addColorStop("1.0",this.o.fgColorEnd);
+                        gradient.addColorStop(0,this.o.fgColorEnd);
+                        gradient.addColorStop(1.0,this.o.fgColorEnd);
                         c.strokeStyle = r ? gradient : this.fgColor ;
 
                         if(shadowColor)
@@ -827,20 +847,20 @@
                         else
                             c.shadowColor = "#555555";
                         c.shadowBlur    = 10;
-                        c.shadowOffsetX = 10; 
+                        c.shadowOffsetX = 10;
                         c.shadowOffsetY = 0;
                         c.arc(this.xy, this.xy, this.radius, this.PI2 * 1.74, a.e, a.d);
 
                         c.stroke();
                     }
                 }
-             
+
 
             } else {
                 c.beginPath();
-                var gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
-                    gradient.addColorStop("0",this.o.fgColor);
-                    gradient.addColorStop("1.0",this.o.fgColorMid);
+                gradient=c.createLinearGradient(this.w2,0,this.w2,this.h-this.lineWidth);
+                gradient.addColorStop(0,this.o.fgColor);
+                gradient.addColorStop(1.0,this.o.fgColorMid);
                 c.strokeStyle = r ? gradient : this.fgColor ;
                 c.arc(this.xy, this.xy, this.radius, a.s, a.e, a.d);
                 c.stroke();

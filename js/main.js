@@ -5,20 +5,6 @@
 */
 
 $(function($) {
-    // error handling
-    var gOldOnError = window.onerror;
-    window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
-        ga('send', 'exception', {
-            'exDescription': errorMsg,
-            'exFatal': true,
-            'url': url,
-            'lineNumber': lineNumber
-        });
-        if (gOldOnError) {
-            return gOldOnError(errorMsg, url, lineNumber);
-        }
-        return false;
-    }
     var d = new Date();
     $('#copyrightYear').text(d.getFullYear());
     // setup knob arcs
@@ -50,17 +36,17 @@ $(function($) {
         }
     });
     $('.btn-refresh').click(function(e){
-        ga('send', 'event', 'button', 'click', 'refresh');
+        // ga('send', 'event', 'button', 'click', 'refresh');
         e.preventDefault();
 
-        fieldName = $(this).attr('data-field');
-        console.log(fieldName);
+        var fieldName = $(this).attr('data-field');
+        // console.log(fieldName);
         var input = $("input[name='"+fieldName+"']");
         input.val(input.attr('default-val')).trigger('change');
         if(input.hasClass('color')) {
             input.css('background-color', input.attr('default-val'));
-            rgb = hexToRgb(input.attr('default-val'));
-            txtcolor =
+            var rgb = hexToRgb(input.attr('default-val'));
+            var txtcolor =
                     0.213 * rgb.r +
                     0.715 * rgb.g +
                     0.072 * rgb.b
@@ -71,12 +57,12 @@ $(function($) {
     $('.btn-number').click(function(e){
         e.preventDefault();
         
-        fieldName = $(this).attr('data-field');
-        type      = $(this).attr('data-type');
-        step = Number($(this).attr('data-step'));
+        var fieldName = $(this).attr('data-field');
+        var type      = $(this).attr('data-type');
+        var step = Number($(this).attr('data-step'));
         var input = $("input[name='"+fieldName+"']");
         var currentVal = Number(input.val());
-
+        var curr;
         if (!isNaN(currentVal)) {
             if(type == 'minus') {
                 
@@ -103,15 +89,16 @@ $(function($) {
             input.val(0);
         }
     });
-    $('.input-number').focusin(function(){
+    var inputNumber = $('.input-number');
+    inputNumber.focusin(function(){
        $(this).data('oldValue', $(this).val());
     });
-    $('.input-number').change(function() {
-        minValue =  parseInt($(this).attr('min'));
-        maxValue =  parseInt($(this).attr('max'));
-        valueCurrent = parseInt($(this).val());
+    inputNumber.change(function() {
+        var minValue =  parseInt($(this).attr('min'));
+        var maxValue =  parseInt($(this).attr('max'));
+        var valueCurrent = parseInt($(this).val());
 
-        name = $(this).attr('name');
+        var name = $(this).attr('name');
         if(typeof $(this).attr('min') !== 'undefined')
             if(valueCurrent >= minValue) {
                 $(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
@@ -146,8 +133,8 @@ $(function($) {
             }
     });
 
-    $('#how-to-btn').click(function(e){
-        ga('send', 'event', 'button', 'click', 'how-to-btn');
+    $('#how-to-btn').click(function(){
+        // ga('send', 'event', 'button', 'click', 'how-to-btn');
         var intro = introJs();
         intro.setOptions({
             steps: [
@@ -205,6 +192,7 @@ $(function($) {
           intro.start();
         });
 
+    //noinspection JSUnresolvedVariable
     var isSafari = /Safari/.test(navigator.userAgent) && /Apple Computer/.test(navigator.vendor);
     if (isSafari) $('#browser-alert').modal();
 });
@@ -213,48 +201,61 @@ $(function($) {
 function changeArc(arcId, dataChange, value, doNotLog) {
     if(doNotLog) {
         // don't send to ga
-    } else {
-        ga('send', 'event', 'button', 'click', 'changeArc_' + arcId + '_' + dataChange);
-    }  
+    // } else {
+    //     // ga('send', 'event', 'button', 'click', 'changeArc_' + arcId + '_' + dataChange);
+    }
+    // console.log(dataChange);
 	var obj = {};
-    color = $(arcId).css('color');
-    if(dataChange === 'max-value') {
-        obj = {"max":value};
+    var color = $(arcId).css('color');
+    if (dataChange === 'data-direction') {
+        if (value !== 'up') {
+            $(arcId).parents('.chart-box').find('.subtext-pre').text('to');
+        } else {
+            $(arcId).parents('.chart-box').find('.subtext-pre').text('of');
+        }
+        obj = {"direction": value};
+        $(arcId).attr('data-direction', value);
+    }else if(dataChange === 'steps') {
+        // obj = {"steps": value};
+        $(arcId).attr('data-steps', value);
+        return;
+    } else if (dataChange === 'max-value') {
+        obj = {"max": value};
         $(arcId).attr('data-max', value);
         $(arcId).parents('.chart-box').find('.subtext-max').text(value);
-    } else if(dataChange === 'foreground-color-start') {
-        obj = {"fgColor":value};
+    } else if (dataChange === 'foreground-color-start') {
+        obj = {"fgColor": value};
         $(arcId).attr('data-fgcolor', value);
-    } else if(dataChange === 'foreground-color-mid') {
-        obj = {"fgColorMid":value};
+    } else if (dataChange === 'foreground-color-mid') {
+        obj = {"fgColorMid": value};
         $(arcId).attr('data-fgcolormid', value);
-    } else if(dataChange === 'foreground-color-end') {
-        obj = {"fgColorEnd":value};
+    } else if (dataChange === 'foreground-color-end') {
+        obj = {"fgColorEnd": value};
         $(arcId).attr('data-fgcolorend', value);
-    } else if(dataChange === 'background-color') {
-        obj = {"bgColor":value, "bgColorMid":value, "bgColorEnd":value};
+    } else if (dataChange === 'background-color') {
+        obj = {"bgColor": value, "bgColorMid": value, "bgColorEnd": value};
         $(arcId).attr('data-bgcolor', value);
-    } else if(dataChange === 'arc-thickness') {
-        obj = {"thickness":value};
+    } else if (dataChange === 'arc-thickness') {
+        obj = {"thickness": value};
         $(arcId).attr('data-thickness', value);
-    } else if(dataChange === 'background-thickness') {
-        obj = {"bgthickness":value};
+    } else if (dataChange === 'background-thickness') {
+        obj = {"bgthickness": value};
         $(arcId).attr('data-bgthickness', value);
-    } else if(dataChange === 'size') {
-        obj = {"width":value, "height": value};
+    } else if (dataChange === 'size') {
+        obj = {"width": value, "height": value};
         $(arcId).attr('data-width', value);
         $(arcId).attr('data-height', value);
-    } else if(dataChange === 'x-position') {
-        $(arcId).closest('.canvas-box').css('left', value+'px');
-    } else if(dataChange === 'y-position') {
-        $(arcId).closest('.canvas-box').css('top', value+'px');
-    } else if(dataChange === 'data-linecap') {
-        obj = {"lineCap":value};
+    } else if (dataChange === 'x-position') {
+        $(arcId).closest('.canvas-box').css('left', value + 'px');
+    } else if (dataChange === 'y-position') {
+        $(arcId).closest('.canvas-box').css('top', value + 'px');
+    } else if (dataChange === 'data-linecap') {
+        obj = {"lineCap": value};
         $(arcId).attr('data-linecap', value);
-    } else if(dataChange === 'shadow-color') {
+    } else if (dataChange === 'shadow-color') {
         $(arcId).attr('data-shadowColor', value);
-    } else if(dataChange === 'text-color') {
-        obj = {"inputColor":value};
+    } else if (dataChange === 'text-color') {
+        obj = {"inputColor": value};
         $('.knob').css('color', value);
         $('.subtext').css('color', value);
         $(arcId).attr('data-inputColor', value);
@@ -263,6 +264,7 @@ function changeArc(arcId, dataChange, value, doNotLog) {
         $('.subtext-units').text(value);
         return;
     }
+
     obj['inputColor'] = color;
     if(dataChange !== 'current-value') {
 	   $(arcId).attr(dataChange, value).trigger("configure", obj);
@@ -273,32 +275,38 @@ function changeArc(arcId, dataChange, value, doNotLog) {
 }
 
 function showFilenamePrompt(el) {
-    chart = $(el).attr('chart-box');
+    var chart = $(el).attr('chart-box');
     $('#filenamePrompt-submit').attr('chart-box', chart);
-    chart = chart.replace('#', '');  
+    chart = chart.replace('#', '');
     chart = chart.replace('arc', '');
     // $('#file-prefix').val(chart);
     // $('#file-prefix-output').text(chart);
-    $("#merge-checkbox").bootstrapSwitch();
-    $("#merge-checkbox").bootstrapSwitch('state', false);
+    var mergeCheckBox = $("#merge-checkbox");
+    mergeCheckBox.bootstrapSwitch();
+    mergeCheckBox.bootstrapSwitch('state', false);
     handleFilenamePromptEvents(chart, false);
 
-    $('#merge-checkbox').on('switchChange.bootstrapSwitch', function(event, state) {
-      handleFilenamePromptEvents($("#merge-checkbox").attr('chart-box'), state)
+    mergeCheckBox.on('switchChange.bootstrapSwitch', function(event, state) {
+        handleFilenamePromptEvents(mergeCheckBox.attr('chart-box'), state)
+    });
+    var filePrefix = $('.file-prefix');
+    var filePrefixOutput = $('#file-prefix-output');
+    //noinspection JSUnresolvedFunction
+    filePrefix.keyup(function () {
+        filePrefixOutput.text($(this).val());
+    });
+    filePrefix.focus(function () {
+        filePrefixOutput.text($(this).val());
     });
 
-    $('.file-prefix').keyup(function (e) {
-        $('#file-prefix-output').text($(this).val());
+    var fileSuffix = $('.file-suffix');
+    var fileSuffixOutput = $('#file-suffix-output');
+    //noinspection JSUnresolvedFunction
+    fileSuffix.keyup(function () {
+        fileSuffixOutput.text($(this).val());
     });
-    $('.file-prefix').focus(function (e) {
-        $('#file-prefix-output').text($(this).val());
-    });
-
-    $('.file-suffix').keyup(function (e) {
-        $('#file-suffix-output').text($(this).val());
-    });
-    $('.file-suffix').focus(function (e) {
-        $('#file-suffix-output').text($(this).val());
+    fileSuffix.focus(function () {
+        fileSuffixOutput.text($(this).val());
     });
 
     $('#question-merge').tooltip({title: "This will merge all the arcs into a single image", placement: "right"});
@@ -307,10 +315,11 @@ function showFilenamePrompt(el) {
 
 function handleFilenamePromptEvents(chart, mergeState) {
     if(!mergeState) { //called on init, unmerged images
+        var mergeCheckBox = $("#merge-checkbox");
         if(chart.indexOf('single') > -1) {
             $('#merge-group').hide();
-            $("#merge-checkbox").attr('chart-box', '');
-            $("#merge-checkbox").attr('chart-box', chart);
+            mergeCheckBox.attr('chart-box', '');
+            mergeCheckBox.attr('chart-box', chart);
             $('#filename-group-outer').hide();
             $('#filename-group-middle').hide();
             $('#filename-group-inner').hide();
@@ -321,8 +330,8 @@ function handleFilenamePromptEvents(chart, mergeState) {
             $('#triple-file-output').addClass('hidden');
         } else if(chart.indexOf('double') > -1) {
             $('#merge-group').show();
-            $("#merge-checkbox").attr('chart-box', '');
-            $("#merge-checkbox").attr('chart-box', chart);
+            mergeCheckBox.attr('chart-box', '');
+            mergeCheckBox.attr('chart-box', chart);
             $('#filename-group-outer').show();
             $('#filename-group-middle').hide();
             $('#filename-group-inner').show();
@@ -332,8 +341,8 @@ function handleFilenamePromptEvents(chart, mergeState) {
             $('#triple-file-output').addClass('hidden');
         } else if(chart.indexOf('triple') > -1) {
             $('#merge-group').show();
-            $("#merge-checkbox").attr('chart-box', '');
-            $("#merge-checkbox").attr('chart-box', chart);
+            mergeCheckBox.attr('chart-box', '');
+            mergeCheckBox.attr('chart-box', chart);
             $('#filename-group-outer').show();
             $('#filename-group-middle').show();
             $('#filename-group-inner').show();
@@ -379,23 +388,22 @@ function generateImages(el) {
         var fileSuffix = $('#file-suffix').val();
         var canvasList = $($(el).attr('chart-box') + ' canvas');
         var can = document.createElement('canvas');
-        offset = 0;
+        var offset = 0;
         can.width = 300 + offset;
         can.height = 300 + offset;
         var ctx = can.getContext('2d');
-
         var zip = new JSZip();
         var img = zip.folder("images");
-        ga('send', 'event', 'button', 'click', 'generateImages_arc'+canvasList.length);
-
+        var size;
+        // ga('send', 'event', 'button', 'click', 'generateImages_arc'+canvasList.length);
         if(canvasList.length == 3) {
-            var size = calculateSize(canvasList, 3);
+            size = calculateSize(canvasList, 3);
             can.width = size.width;
             can.height = size.height;
             if(merge) {
-                for(i = parseInt($(canvasList[0]).next().attr('data-min')); i <= parseInt($(canvasList[0]).next().attr('data-max')); i++) {
-                    for(j = parseInt($(canvasList[1]).next().attr('data-min')); j <= parseInt($(canvasList[1]).next().attr('data-max')); j++) {
-                        for(k = parseInt($(canvasList[2]).next().attr('data-min')); k <= parseInt($(canvasList[2]).next().attr('data-max')); k++) {
+                for(var i = parseInt($(canvasList[0]).next().attr('data-min')); i <= parseInt($(canvasList[0]).next().attr('data-max')); i++) {
+                    for(var j = parseInt($(canvasList[1]).next().attr('data-min')); j <= parseInt($(canvasList[1]).next().attr('data-max')); j++) {
+                        for(var k = parseInt($(canvasList[2]).next().attr('data-min')); k <= parseInt($(canvasList[2]).next().attr('data-max')); k++) {
                             changeArc('#'+$(canvasList[0]).next().attr('id'), 'current-value', i, true);
                             changeArc('#'+$(canvasList[1]).next().attr('id'), 'current-value', j, true);
                             changeArc('#'+$(canvasList[2]).next().attr('id'), 'current-value', k, true);
@@ -410,7 +418,7 @@ function generateImages(el) {
                     }
                 }
             } else {
-                for(x = 0; x < canvasList.length; x++) {
+                for(var x = 0; x < canvasList.length; x++) {
                     for(i = parseInt($(canvasList[x]).next().attr('data-min')); i <= parseInt($(canvasList[x]).next().attr('data-max')); i++) {
                         changeArc('#'+$(canvasList[x]).next().attr('id'), 'current-value', i, true);
                         ctx.drawImage(canvasList[x], parseInt($(canvasList[x]).closest('.canvas-box').css('left'))+offset/2, parseInt($(canvasList[x]).closest('.canvas-box').css('top'))+offset/2, parseInt($(canvasList[x]).css('width')), parseInt($(canvasList[x]).css('height')));
@@ -427,7 +435,7 @@ function generateImages(el) {
                 }
             }
         } else if(canvasList.length == 2) {
-            var size = calculateSize(canvasList, 2);
+            size = calculateSize(canvasList, 2);
             can.width = size.width;
             can.height = size.height;
             if(merge) {
@@ -449,6 +457,7 @@ function generateImages(el) {
                     for(i = parseInt($(canvasList[x]).next().attr('data-min')); i <= parseInt($(canvasList[x]).next().attr('data-max')); i++) {
                         changeArc('#'+$(canvasList[x]).next().attr('id'), 'current-value', i, true);
                         ctx.drawImage(canvasList[x], parseInt($(canvasList[x]).closest('.canvas-box').css('left'))+offset/2, parseInt($(canvasList[x]).closest('.canvas-box').css('top'))+offset/2, parseInt($(canvasList[x]).css('width')), parseInt($(canvasList[x]).css('height')));
+                        var filename;
                         if(x === 0)
                             filename = filePrefixOuter;
                         if(x === 1)
@@ -460,44 +469,66 @@ function generateImages(el) {
                 }
             }
         } else if(canvasList.length == 1) {
-            var size = calculateSize(canvasList, 1);
+            var maxVal = parseInt($(canvasList[0]).next().attr('data-max'));
+            var minVal = parseInt($(canvasList[0]).next().attr('data-min'));
+            var stepsNum = parseInt($(canvasList[0]).next().attr('data-steps'));
+            var loopStep = 1;
+            var changeLabel = false;
+            if (stepsNum < maxVal) {
+                loopStep = parseInt(Math.round((maxVal - minVal) / stepsNum));
+            } else if (stepsNum > maxVal){
+                var tmp = maxVal;
+                maxVal = stepsNum;
+                stepsNum = tmp;
+                changeLabel = true;
+                // $(canvasList[0]).next().attr('data-max',stepsNum0);
+                changeArc('#'+$(canvasList[0]).next().attr('id'), 'max-value', maxVal, true);
+            }
+            size = calculateSize(canvasList, 1);
+            var id = $('#'+$(canvasList[0]).next().attr('id'));
+            var countDown = $(canvasList[0]).next().attr('data-direction') !== 'up';
             can.width = size.width;
             can.height = size.height;
-            for(i = parseInt($(canvasList[0]).next().attr('data-min')); i <= parseInt($(canvasList[0]).next().attr('data-max')); i++) {
+            for(i = minVal; i <= maxVal; i+=loopStep) {
                 changeArc('#'+$(canvasList[0]).next().attr('id'), 'current-value', i, true);
                 //merge arcs
                 ctx.drawImage(canvasList[0], parseInt($(canvasList[0]).closest('.canvas-box').css('left'))+offset/2, parseInt($(canvasList[0]).closest('.canvas-box').css('top'))+offset/2, parseInt($(canvasList[0]).css('width')), parseInt($(canvasList[0]).css('height')));
                 //add text
-                if($('#'+$(canvasList[0]).next().attr('id')).attr('data-displayinput') == 'true' 
-                    && $('.subtext').hasClass('hidden')) {
-                    value = $('#'+$(canvasList[0]).next().attr('id')).val();
-                    font = $('#'+$(canvasList[0]).next().attr('id')).css('font-size') + ' ' + $('#'+$(canvasList[0]).next().attr('id')).css('font-family').split(',')[0];
-                    color = $('#'+$(canvasList[0]).next().attr('id')).css('color');
+                // id = $('#'+$(canvasList[0]).next().attr('id'));
+                var value = id.val();
+                if (changeLabel){
+                    value = Math.round((i * stepsNum / maxVal));
+                    if (countDown){
+                         value = stepsNum - value;
+                    }
+                }
+                var font = id.css('font-size') + ' ' + id.css('font-family').split(',')[0];
+                var color = id.css('color');
+                var subtext = $('.subtext');
+                if(id.attr('data-displayinput') == 'true' && subtext.hasClass('hidden')) {
                     ctx.font=font;
                     ctx.fillStyle = color;
-                    textWidth = ctx.measureText(value).width;
+                    var textWidth = ctx.measureText(value).width;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(value, (can.width/2), (can.height/2));
-                } else if($('#'+$(canvasList[0]).next().attr('id')).attr('data-displayinput') == 'true' 
-                    && !$('.subtext').hasClass('hidden')) {
-                    value = $('#'+$(canvasList[0]).next().attr('id')).val();
-                    font = $('#'+$(canvasList[0]).next().attr('id')).css('font-size') + ' ' + $('#'+$(canvasList[0]).next().attr('id')).css('font-family').split(',')[0];
-                    color = $('#'+$(canvasList[0]).next().attr('id')).css('color');
+                } else if(id.attr('data-displayinput') == 'true' && !subtext.hasClass('hidden')) {
                     ctx.font=font;
                     ctx.fillStyle = color;
                     textWidth = ctx.measureText(value).width;
-                    textHeight = ctx.measureText(value).height;
+                    // textHeight = ctx.measureText(value).height;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(value, (can.width/2), (can.height/2)-15);
-
-                    value = $('.subtext').text().toUpperCase();
-                    font = $('.subtext').css('font-size') + ' ' + $('.subtext').css('font-family').split(',')[0];
-                    color = $('.subtext').css('color');
+                    value = subtext.text().toUpperCase().replace(maxVal.toString,stepsNum.toString);
+                    if (changeLabel){
+                        value = value.replace(maxVal.toString(),stepsNum.toString());
+                    }
+                    font = subtext.css('font-size') + ' ' + subtext.css('font-family').split(',')[0];
+                    color = subtext.css('color');
                     ctx.font=font;
                     ctx.fillStyle = color;
-                    textWidth2 = ctx.measureText(value).width;
+                    // textWidth2 = ctx.measureText(value).width;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(value, (can.width/2), (can.height/2)+35);
@@ -505,6 +536,10 @@ function generateImages(el) {
                 filename = filePrefix+i+fileSuffix+".png";
                 img.file(filename, can.toDataURL("image/png").substring(22), {base64: true});
                 ctx.clearRect(0, 0, can.width, can.height);
+            }
+            if (changeLabel){
+                changeArc('#'+$(canvasList[0]).next().attr('id'), 'max-value', stepsNum, true);
+                changeArc('#'+$(canvasList[0]).next().attr('id'), 'current-value', stepsNum, true);
             }
         }
         var content = zip.generate({type:"blob"});
@@ -516,37 +551,38 @@ function generateImages(el) {
 
 function calculateSize(canvasList, arcs) {
     var obj = {};
+    var left0,left1,left2,top0,top1,top2,right0,right1,right2,bottom0,bottom1,bottom2;
     if(arcs === 3) {
-        var left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
-        var left1 = $(canvasList[1]).closest('.canvas-box').offset().left;
-        var left2 = $(canvasList[2]).closest('.canvas-box').offset().left;
-        var top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
-        var top1 = $(canvasList[1]).closest('.canvas-box').offset().top;
-        var top2 = $(canvasList[2]).closest('.canvas-box').offset().top;
-        var right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
-        var right1 = left1 + parseInt($(canvasList[1]).next().attr('data-width'));
-        var right2 = left2 + parseInt($(canvasList[2]).next().attr('data-width'));
-        var bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
-        var bottom1 = top1 + parseInt($(canvasList[1]).next().attr('data-height'));
-        var bottom2 = top2 + parseInt($(canvasList[2]).next().attr('data-height'));
+        left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
+        left1 = $(canvasList[1]).closest('.canvas-box').offset().left;
+        left2 = $(canvasList[2]).closest('.canvas-box').offset().left;
+        top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
+        top1 = $(canvasList[1]).closest('.canvas-box').offset().top;
+        top2 = $(canvasList[2]).closest('.canvas-box').offset().top;
+        right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
+        right1 = left1 + parseInt($(canvasList[1]).next().attr('data-width'));
+        right2 = left2 + parseInt($(canvasList[2]).next().attr('data-width'));
+        bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
+        bottom1 = top1 + parseInt($(canvasList[1]).next().attr('data-height'));
+        bottom2 = top2 + parseInt($(canvasList[2]).next().attr('data-height'));
         obj.width = Math.max(right0, right1, right2) - Math.min(left0, left1, left2);
         obj.height = Math.max(bottom0, bottom1, bottom2) - Math.min(top0, top1, top2);
     } else if(arcs === 2) {
-        var left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
-        var left1 = $(canvasList[1]).closest('.canvas-box').offset().left;
-        var top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
-        var top1 = $(canvasList[1]).closest('.canvas-box').offset().top;
-        var right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
-        var right1 = left1 + parseInt($(canvasList[1]).next().attr('data-width'));
-        var bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
-        var bottom1 = top1 + parseInt($(canvasList[1]).next().attr('data-height'));
+        left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
+        left1 = $(canvasList[1]).closest('.canvas-box').offset().left;
+        top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
+        top1 = $(canvasList[1]).closest('.canvas-box').offset().top;
+        right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
+        right1 = left1 + parseInt($(canvasList[1]).next().attr('data-width'));
+        bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
+        bottom1 = top1 + parseInt($(canvasList[1]).next().attr('data-height'));
         obj.width = Math.max(right0, right1) - Math.min(left0, left1);
         obj.height = Math.max(bottom0, bottom1) - Math.min(top0, top1);
     } else if(arcs === 1) {
-        var left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
-        var top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
-        var right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
-        var bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
+        left0 = $(canvasList[0]).closest('.canvas-box').offset().left;
+        top0 = $(canvasList[0]).closest('.canvas-box').offset().top;
+        right0 = left0 + parseInt($(canvasList[0]).next().attr('data-width'));
+        bottom0 = top0 + parseInt($(canvasList[0]).next().attr('data-height'));
         obj.width = right0 - left0;
         obj.height = bottom0 - top0;
     }
@@ -571,6 +607,4 @@ function hexToRgb(hex) {
 var countDecimals = function (value) {
     if(Math.floor(value) === value) return 0;
     return value.toString().split(".")[1].length || 0; 
-}
-
-
+};

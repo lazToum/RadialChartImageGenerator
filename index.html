@@ -17,19 +17,10 @@
         <link rel="stylesheet" href="css/intro/intro.min.css">
         <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
         <script src="js/jquery/jquery.min.js"></script>
-        <!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+        <!--[if IE]><script type="text/javascript" src="js/excanvas.js"></script><![endif]-->
         <script src="js/knob/jquery.knob.js"></script>
         <script src="js/options.js"></script>
         <script src="js/main.js"></script>
-        <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-          ga('create', 'UA-60593416-1', 'auto');
-          ga('send', 'pageview');
-        </script>
     </head>
     <body>
         <nav class="navbar navbar-default">
@@ -56,14 +47,13 @@
         </nav>
         <div class="container">
             <div class="row charts-row">
-
                 <div class="col-md-4">
                     <h3>Single Arc</h3>
                     <div id="single-arc" class="chart-box">
                         
-                        <div class="canvas-box" style="position:absolute;left:0px;top:0px">
-                            <input id="single-single-arc" class="knob with-subtext" data-min="0" data-max="100" value="75" data-bgColor="#340914" data-fgColor="#FF1509" data-fgColorMid="#f8009e" data-fgColorEnd="#f707e3" data-displayInput=true data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555">
-                            <div class="subtext">of <span class="subtext-max">100</span> <span class="subtext-units">cals</span></div>
+                        <div class="canvas-box" style="position:absolute;left:0;top:0">
+                            <input id="single-single-arc" class="knob with-subtext" data-direction="up" data-min="0" data-steps="100" data-max="100" value="75" data-bgColor="#340914" data-fgColor="#FF1509" data-fgColorMid="#f8009e" data-fgColorEnd="#f707e3" data-displayInput=true data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555" title="">
+                            <div class="subtext"><span class="subtext-pre">of</span> <span class="subtext-max">100</span> <span class="subtext-units">secs</span></div>
                         </div>
 
                     </div>
@@ -71,17 +61,16 @@
                     <div class="chart-options"></div>
                     <button class="btn btn-primary generate-btn" chart-box="#single-arc" onclick="showFilenamePrompt(this)">Generate Images</button>
                 </div>
-
                 <div class="col-md-4">
                     <h3>Double Arc</h3>
                     <div id="double-arc" class="chart-box">
 
-                        <div class="canvas-box" style="position:absolute;left:0px;top:0px">
-                            <input id="double-outer-arc" class="knob" data-min="0" data-max="100" value="75" data-bgColor="#2c4204" data-fgColor="#9cff00" data-fgColorMid="#aaff00" data-fgColorEnd="#d8fe00" data-displayInput=false data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555">
+                        <div class="canvas-box" style="position:absolute;left:0;top:0">
+                            <input id="double-outer-arc" class="knob" data-min="0" data-max="100" data-steps="100" value="75" data-bgColor="#2c4204" data-fgColor="#9cff00" data-fgColorMid="#aaff00" data-fgColorEnd="#d8fe00" data-displayInput=false data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555" title="">
                         </div>
 
                         <div class="canvas-box" style="position:absolute;left:32px;top:32px">
-                            <input id="double-inner-arc" class="knob" data-min="0" data-max="100" value="50" data-bgColor="#564d00" data-fgColor="#e8c629" data-fgColorMid="#ffd200" data-fgColorEnd="#fff32b" data-displayInput=false data-width="236" data-height="236" data-thickness=".25" data-bgthickness=".25" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555">
+                            <input id="double-inner-arc" class="knob" data-min="0" data-max="100"  data-steps="100" value="50" data-bgColor="#564d00" data-fgColor="#e8c629" data-fgColorMid="#ffd200" data-fgColorEnd="#fff32b" data-displayInput=false data-width="236" data-height="236" data-thickness=".25" data-bgthickness=".25" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555" title="">
                         </div>
 
                     </div>
@@ -89,21 +78,20 @@
                     <div class="chart-options"></div>
                     <button class="btn btn-primary generate-btn" chart-box="#double-arc" onclick="showFilenamePrompt(this)">Generate Images</button>
                 </div>
-
                 <div class="col-md-4">
                     <h3>Triple Arc</h3>
                     <div id="triple-arc" class="chart-box">
                         
-                        <div class="canvas-box" style="position:absolute;left:0px;top:0px">
-                            <input id="triple-outer-arc" class="knob" data-min="0" data-max="100" value="100" data-bgcolor="#340914" data-fgcolor="#ff1509" data-fgcolormid="#ff1c5c" data-fgcolorend="#ff258f" data-displayInput=false data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#fffff" data-shadow=true data-shadowColor="#555555">
+                        <div class="canvas-box" style="position:absolute;left:0;top:0">
+                            <input id="triple-outer-arc" class="knob" data-min="0" data-steps="100" data-max="100" value="100" data-bgcolor="#340914" data-fgcolor="#ff1509" data-fgcolormid="#ff1c5c" data-fgcolorend="#ff258f" data-displayInput=false data-width="300" data-height="300" data-thickness=".2" data-bgthickness=".2" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#fffff" data-shadow=true data-shadowColor="#555555" title="">
                         </div>
 
                         <div class="canvas-box" style="position:absolute;left:32px;top:32px">
-                            <input id="triple-middle-arc" class="knob" data-min="0" data-max="100" value="100" data-bgcolor="#2c4204" data-fgcolor="#9cff00" data-fgcolormid="#aaff00" data-fgcolorend="#d8fe00" data-displayInput=false data-width="236" data-height="236" data-thickness=".25" data-bgthickness=".25" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555">
+                            <input id="triple-middle-arc" class="knob" data-min="0" data-steps="100"  data-max="100" value="100" data-bgcolor="#2c4204" data-fgcolor="#9cff00" data-fgcolormid="#aaff00" data-fgcolorend="#d8fe00" data-displayInput=false data-width="236" data-height="236" data-thickness=".25" data-bgthickness=".25" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555" title="">
                         </div>
 
                         <div class="canvas-box" style="position:absolute;left:63px;top:63px">
-                            <input id="triple-inner-arc" class="knob" data-min="0" data-max="100" value="100" data-bgcolor="#112a2e" data-fgcolor="#5bfeeb" data-fgcolormid="#65e9ed" data-fgcolorend="#6ae9f8" data-displayInput=false data-width="174" data-height="174" data-thickness=".35" data-bgthickness=".35" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555">
+                            <input id="triple-inner-arc" class="knob" data-min="0" data-max="100" data-steps="100" value="100" data-bgcolor="#112a2e" data-fgcolor="#5bfeeb" data-fgcolormid="#65e9ed" data-fgcolorend="#6ae9f8" data-displayInput=false data-width="174" data-height="174" data-thickness=".35" data-bgthickness=".35" data-angleOffset=0 data-linecap=round data-readOnly=true data-inputColor="#ffffff" data-shadow=true data-shadowColor="#555555" title="">
                         </div>
 
                     </div>
@@ -111,7 +99,6 @@
                     <div class="chart-options"></div>
                     <button class="btn btn-primary generate-btn" chart-box="#triple-arc" onclick="showFilenamePrompt(this)">Generate Images</button>
                 </div>
-     
             </div>
         </div>
 
@@ -144,7 +131,7 @@
                         <input type="checkbox" name="merge-checkbox" id="merge-checkbox">
                         <span id="question-merge">?</span>
                     </div>
-                    <div id="filename-group" class="form-group">
+                    <div id="filename-prefix-group" class="form-group">
                         <label for="file-prefix" class="control-label">Filename Prefix:</label>
                         <div class="input-group">
                             <input type="text" class="form-control file-prefix" id="file-prefix" value="prefix">
@@ -154,25 +141,25 @@
                     <div id="filename-group-outer" class="form-group">
                         <label for="file-prefix" class="control-label">Outer Arc Filename Prefix:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control file-prefix" id="outer-file-prefix" value="outer">
+                            <input type="text" class="form-control file-prefix" id="outer-file-prefix" value="outer" title="">
                             <span class="input-group-addon">3.png</span>
                         </div>
                     </div>
                     <div id="filename-group-middle" class="form-group">
                         <label for="file-prefix" class="control-label">Middle Arc Filename Prefix:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control file-prefix" id="middle-file-prefix" value="middle">
+                            <input type="text" class="form-control file-prefix" id="middle-file-prefix" value="middle" title="">
                             <span class="input-group-addon">5.png</span>
                         </div>
                     </div>
                     <div id="filename-group-inner" class="form-group">
                         <label for="file-prefix" class="control-label">Inner Arc Filename Prefix:</label>
                         <div class="input-group">                        
-                            <input type="text" class="form-control file-prefix" id="inner-file-prefix" value="inner">
+                            <input type="text" class="form-control file-prefix" id="inner-file-prefix" value="inner" title="">
                             <span class="input-group-addon">2.png</span>
                         </div>
                     </div>
-                    <div id="filename-group" class="form-group">
+                    <div id="filename-suffix-group" class="form-group">
                         <label for="file-suffix" class="control-label">Filename Suffix:</label>
                         <div class="input-group">
                             <span class="input-group-addon">prefix3</span>
@@ -184,7 +171,7 @@
                 <h5>
                     An example using the above file prefix:
                 </h5>
-                <span id="file-prefix-output">prefix</span><span id="single-file-output">3</span><span id="double-file-output" class="hidden">-5</span><span id="triple-file-output" class="hidden">-2</span><span id="file-suffix-output">suffix</span>.png
+                <span id="file-prefix-output">prefix</span><span id="single-file-output">3</span><span id="double-file-output" class="hidden"></span><span id="triple-file-output" class="hidden">-2</span><span id="file-suffix-output">suffix</span>.png
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

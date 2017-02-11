@@ -198,3 +198,10 @@ a:focus {
 	font-weight: 400;
 	margin-right: 5px;
 }
+.direction-toggle {
+	margin-bottom: 5px;
+}
+.direction-toggle .control-label {
+	font-weight: 400;
+	margin-right: 5px;
+}
